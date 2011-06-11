@@ -614,15 +614,36 @@ function inject_indextank_head_script(){
 <script type="text/javascript" src="https://github.com/flaptor/indextank-jquery/raw/1.x/jquery.indextank.statsrenderer.js"></script> 
     <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script> 
         <script> 
-            $(document).ready(function(){
+  $(document).ready(function(){
+
+
+var fmt = function(item) {
+     var d = new Date(item.timestamp * 1000);
+     var r = $("<div></div>").addClass("post_box")
+                 .append( $("<div></div>").addClass("headline_area")
+                 .append( $("<h2></h2>").addClass("entry-title")
+                 .append( $("<a></a>").attr("href", "<?php echo site_url();?>?p=" + item.docid ).html(item.post_title))
+              )
+              .append( $("<span></span>").addClass("description").css({'font-size': "1.2em"}).html(item.snippet_text || item.post_content || "").prepend("...").append("..."))
+              .append( $("<p></p>").addClass("headline_meta")
+              .append( " by ", 
+                       $("<span></span>").addClass("author").text(item.post_author.substring(0,item.post_author.length/2)),
+                       " on ",
+                       $("<abbr></abbr").addClass("published").text(d.toDateString())
+                     )
+               )
+         )
+     return r;
+};
+
+
                 $("#searchform").indextank_Ize(<?php echo '"http://'.$public_api_url.'","'.get_option("it_index_name").'"' ?>);
-                $("#content").indextank_Renderer();
+                $("#content").indextank_Renderer({format:fmt});
                 $("#stats").indextank_StatsRenderer().hide();
                 $("#s").indextank_Autocomplete().indextank_AjaxSearch({listeners: $("#content, #stats, #query_helper"), fields: "post_title,post_author,timestamp",  snippets:"text"}).indextank_InstantSearch();
  
                 $("#query_helper").bind("Indextank.AjaxSearch.success", function( e, data ) { $("#query_helper").hide()});
             });
- 
         </script>	
 <?php
 }
