@@ -601,43 +601,28 @@ function inject_indextank_head_script(){
     $private_api_url = get_option("it_api_url", "http://:aoeu@indextank.com/");
     $parts = explode("@", $private_api_url, 2);
     $public_api_url = $parts[1];
-    ?>
-        <script>
-        jQuery(window).load(function(){
-                var a = jQuery( "#s" ).autocomplete({
-                                        source: function( request, response ) {
-                                                jQuery.ajax({
-                                                    url:'http://<?php echo $public_api_url; ?>/v1/indexes/<?php echo get_option("it_index_name");?>/autocomplete',
-                                                    dataType: "jsonp",
-                                                    data: { query: request.term },
-                                                    success: function( data ) {
-                                                            // create highlighting labels
-                                                            var regex = new RegExp("(?![^&;]+;)(?!<[^<>]*)(" + request.term.replace(/([\^\$\(\)\[\]\{\}\*\.\+\?\|\\])/gi, "\\$1") + ")(?![^<>]*>)(?![^&;]+;)", "gi");
-                                                            // Indextank returns the possible terms on an array, data.suggestions.
-                                                            response( jQuery.map( data.suggestions, function( item ) {
-                                                                return {
-                                                                    label: item.replace(regex,"<strong>$1</strong>"),
-                                                                    value: item,
-                                                                };
-                                                             }));
-                                                    }
-                                                });
-                                        },
-                                        minLength: 2,
-
-                                        // auto submit when selecting
-                                        select: function(event, ui){
-                                            event.target.value = ui.item.value;
-                                            event.target.form.submit();
-                                        },
-                                    });
-
-                // render highlighting labels
-                a.data( "autocomplete" )._renderItem = function( ul, item ) {
-                    return jQuery( "<li></li>" ).data( "item.autocomplete", item ).append( "<a>" + item.label + "</a>" ).appendTo( ul );
-                };
-        });
-
+     ?>
+<script type='text/javascript' src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script> 
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js?ver=3.1.2'></script> 
+<script type="text/javascript" src="https://github.com/flaptor/indextank-jquery/raw/1.x/jquery.indextank.basic.js"></script> 
+<script type="text/javascript" src="https://github.com/flaptor/indextank-jquery/raw/1.x/jquery.indextank.ize.js"></script> 
+<script type="text/javascript" src="https://github.com/flaptor/indextank-jquery/raw/1.x/jquery.indextank.autocomplete.js"></script> 
+<script type="text/javascript" src="https://github.com/flaptor/indextank-jquery/raw/1.x/jquery.indextank.ajaxsearch.js"></script> 
+<script type="text/javascript" src="https://github.com/flaptor/indextank-jquery/raw/1.x/jquery.indextank.instantlinks.js"></script> 
+<script type="text/javascript" src="https://github.com/flaptor/indextank-jquery/raw/1.x/jquery.indextank.instantsearch.js"></script> 
+<script type="text/javascript" src="https://github.com/flaptor/indextank-jquery/raw/1.x/jquery.indextank.renderer.js"></script> 
+<script type="text/javascript" src="https://github.com/flaptor/indextank-jquery/raw/1.x/jquery.indextank.statsrenderer.js"></script> 
+    <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script> 
+        <script> 
+            $(document).ready(function(){
+                $("#searchform").indextank_Ize(<?php echo '"http://'.$public_api_url.'","'.get_option("it_index_name").'"' ?>);
+                $("#content").indextank_Renderer();
+                $("#stats").indextank_StatsRenderer().hide();
+                $("#s").indextank_Autocomplete().indextank_AjaxSearch({listeners: $("#content, #stats, #query_helper"), fields: "post_title,post_author,timestamp",  snippets:"text"}).indextank_InstantSearch();
+ 
+                $("#query_helper").bind("Indextank.AjaxSearch.success", function( e, data ) { $("#query_helper").hide()});
+            });
+ 
         </script>	
 <?php
 }
